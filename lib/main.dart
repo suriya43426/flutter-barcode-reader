@@ -1,3 +1,4 @@
+import 'package:NextflowBarcodeReader/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,6 +35,11 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Container());
+        body: Container(),
+        floatingActionButton: buildRaisedButton(),
+    );
   }
 }
+
+
+
