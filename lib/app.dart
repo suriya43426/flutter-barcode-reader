@@ -1,7 +1,7 @@
-import 'package:NextflowBarcodeReader/widgets/button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,6 +27,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _scanResult = '...';
+  bool _isYoutube = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,20 +42,39 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 200,
           width: double.infinity,
           child: Card(
-              child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'RESULT-SCAN',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 10),
-                Text('...')
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'RESULT-SCAN',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 10),
+                  Text(_scanResult),
+                  Spacer(),
+                  _isYoutube
+                      ? SizedBox(
+                          width: double.infinity,
+                          child: RaisedButton(
+                            child: Text(
+                              'เพิ่ม Youtube',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Colors.red[900],
+                            onPressed: () async{
+                              if ( await canLaunch(_scanResult)) {
+                                await launch(_scanResult);
+                              }
+                            },
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
             ),
-          )),
+          ),
         ),
       ),
       floatingActionButton: buildRaisedButton(),
@@ -78,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Icons.qr_code,
               color: Colors.white,
             ),
-            Text('SCAN', style: TextStyle(color: Colors.white))
+            Text('SCAN', style: TextStyle(color: Colors.white)),
           ],
         ),
       ),
@@ -86,7 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   startScan() async {
-    String _scanResult;
     var colorCode = '#00ff38';
     var cancelButtonText = 'Cancel Scan';
     var isShowFlatIcon = true;
@@ -95,9 +116,16 @@ class _MyHomePageState extends State<MyHomePage> {
     var scanResult = await FlutterBarcodeScanner.scanBarcode(
         colorCode, cancelButtonText, isShowFlatIcon, scanMode);
 
-    setState(() {
-      _scanResult = scanResult;
-    });
+    if (scanResult != '-1') {
+      if (scanResult.contains('youtube.com')) {
+        _isYoutube = true;
+      }
+      setState(
+        () {
+          _scanResult = scanResult;
+        },
+      );
+    }
 
     // print('scan ${scanResult}');
   }
