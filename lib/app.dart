@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -65,7 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             color: Colors.red[900],
                             onPressed: () async{
                               if ( await canLaunch(_scanResult)) {
-                                await launch(_scanResult);
+                                if (Platform.isIOS) {
+                                  await launch(
+                                    _scanResult,
+                                    forceSafariVC: false,
+                                  );
+                                } else {
+                                  await launch(_scanResult);
+                                }
                               }
                             },
                           ),
